@@ -4,6 +4,10 @@
  License: MIT
 */
 
+/* WARNING: THIS MODULE HAS BEEN UPDATED WITH CUSTOM SORTING BASED ON ULTIMATESORT.JS! */
+/* https://github.com/Imdsm/angular-tablesort */
+/* https://github.com/Imdsm/UltimateSort */
+
 var tableSortModule = angular.module( 'tableSort', [] );
 
 tableSortModule.directive('tsWrapper', function( $log, $parse ) {
@@ -75,20 +79,30 @@ tableSortModule.directive('tsWrapper', function( $log, $parse ) {
             };
 
             $scope.sortFun = function( a, b ) {
-                var i, aval, bval, descending, filterFun;
+                var i, aval, bval, descending, filterFun,
+                    weights = ['3xs', '2xs', 'xs', 's', 'm', 'l', 'xl', '2xl', '3xl'],
+                    offset = (weights.length - 1) / 2;
+
                 for( i=0; i<$scope.sortExpression.length; i=i+1 ){
                     aval = $scope.sortExpression[i][0](a);
                     bval = $scope.sortExpression[i][0](b);
-                    filterFun = b[$scope.sortExpression[i][1]];
-                    if( filterFun ) {
-                        aval = filterFun( aval );
-                        bval = filterFun( bval );
-                    }
-                    if( aval === undefined ) {
-                        aval = "";
-                    }
-                    if( bval === undefined ) {
-                       bval = "";
+
+                    if (_.isString(aval) && _.contains(weights, aval.toLowerCase()) &&
+                        _.isString(bval) && _.contains(weights, bval.toLowerCase())) {
+                        aval = weights.indexOf(aval.toLowerCase()) - offset;
+                        bval = weights.indexOf(bval.toLowerCase()) - offset;
+                    } else {
+                        filterFun = b[$scope.sortExpression[i][1]];
+                        if( filterFun ) {
+                            aval = filterFun( aval );
+                            bval = filterFun( bval );
+                        }
+                        if( aval === undefined ) {
+                            aval = "";
+                        }
+                        if( bval === undefined ) {
+                           bval = "";
+                        }
                     }
                     descending = $scope.sortExpression[i][2];
                     if( aval > bval ) {
@@ -158,7 +172,10 @@ tableSortModule.filter( 'tablesortOrderBy', function(){
     return function(array, sortfun ) {
         if(!array) return;
         var arrayCopy = [];
-        for ( var i = 0; i < array.length; i++) { arrayCopy.push(array[i]); }
+        for ( var i = 0; i < array.length; i++) {
+            arrayCopy.push(array[i]);
+        }
+
         return arrayCopy.sort( sortfun );
     };
 } );
