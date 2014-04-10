@@ -1,5 +1,13 @@
-AngularJS Tablesort
-===================
+AngularJS Tablesort (Custom)
+============================
+
+Note
+----
+
+Please note, this is a custom version of angular-tablesort, which has some custom sorting built in. 
+
+Intro
+-----
 
 Allow tables to be sorted by clicking their headings.
 
